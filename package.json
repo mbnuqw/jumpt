@@ -1,0 +1,83 @@
+{
+  "name": "jumpt",
+  "version": "1.0.0",
+  "author": "mbnuqw",
+  "publisher": "mbnuqw",
+  "engines": {
+    "vscode": "^1.38.0"
+  },
+  "license": "MIT",
+  "displayName": "JumpᏆ",
+  "description": "Fast navigation in visible area.",
+  "categories": ["Other"],
+  "keywords": ["jump", "navigation", "find", "AceJump", "EasyMotion"],
+  "main": "./out/extension.js",
+  "contributes": {
+		"commands": [
+			{
+				"command": "extension.jumpt",
+				"title": "JumpᏆ"
+			},
+			{
+				"command": "extension.jumptback",
+				"title": "JumpᏆ back"
+			}
+		],
+    "configuration": {
+      "title": "JumpᏆ",
+      "properties": {
+        "jumpt.anchors": {
+          "type": "string",
+          "default": "fjdksla;vmbcghieorwnp/FJALKMVCER",
+          "description": "Available anchor signs."
+        },
+        "jumpt.trigger": {
+          "type": ["string", "number"],
+          "default": " ",
+          "description": "Separator char between a search query and target anchor or static length of the search query followed by target anchor."
+        },
+        "jumpt.scroll": {
+          "type": "boolean",
+          "default": false,
+          "description": "Auto-scroll to new position."
+        },
+        "jumpt.bg": {
+          "type": "string",
+          "default": "#0C82F7",
+          "description": "Anchor background color."
+        },
+        "jumpt.fg": {
+          "type": "string",
+          "default": "#ffffff",
+          "description": "Anchor foreground color."
+        }
+      }
+    }
+	},
+  "activationEvents": [
+    "onCommand:extension.jumpt"
+  ],
+  "devDependencies": {
+    "@types/node": "12.7.8",
+    "@types/vscode": "1.38.0",
+    "tslint": "5.20.0",
+    "typescript": "3.6.3"
+  },
+  "scripts": {
+    "vscode:prepublish": "tsc -p ./",
+    "compile": "tsc -p ./",
+		"lint": "tslint -p ./",
+    "watch": "tsc -watch -p ./",
+    "test": "echo \"test\"",
+    "postinstall": "node ./node_modules/vscode/bin/install"
+  },
+  "icon": "assets/icon.png",
+  "bugs": {
+    "url": "https://github.com/mbnuqw/jumpt/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/mbnuqw/jumpt.git"
+  },
+  "homepage": "https://github.com/mbnuqw/jumpt/blob/master/README.md"
+}
