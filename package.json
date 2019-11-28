@@ -9,8 +9,16 @@
   "license": "MIT",
   "displayName": "JumpᏆ",
   "description": "Fast navigation in visible area.",
-  "categories": ["Other"],
-  "keywords": ["jump", "navigation", "find", "AceJump", "EasyMotion"],
+  "categories": [
+    "Other"
+  ],
+  "keywords": [
+    "jump",
+    "navigation",
+    "find",
+    "AceJump",
+    "EasyMotion"
+  ],
   "main": "./out/extension.js",
   "contributes": {
     "commands": [
@@ -63,13 +71,15 @@
   "devDependencies": {
     "@types/node": "12.12.14",
     "@types/vscode": "1.40.0",
-    "tslint": "5.20.1",
+    "@typescript-eslint/eslint-plugin": "2.9.0",
+    "@typescript-eslint/parser": "2.9.0",
+    "eslint": "6.7.1",
     "typescript": "3.7.2"
   },
   "scripts": {
     "vscode:prepublish": "tsc -p ./",
     "compile": "tsc -p ./",
-    "lint": "tslint -p ./",
+    "lint": "eslint --ext .ts ./src",
     "watch": "tsc -watch -p ./",
     "test": "echo \"test\""
   },
