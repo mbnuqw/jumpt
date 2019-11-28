@@ -13,16 +13,16 @@
   "keywords": ["jump", "navigation", "find", "AceJump", "EasyMotion"],
   "main": "./out/extension.js",
   "contributes": {
-		"commands": [
-			{
-				"command": "extension.jumpt",
-				"title": "JumpᏆ"
-			},
-			{
-				"command": "extension.jumptback",
-				"title": "JumpᏆ back"
-			}
-		],
+    "commands": [
+      {
+        "command": "extension.jumpt",
+        "title": "JumpᏆ"
+      },
+      {
+        "command": "extension.jumptback",
+        "title": "JumpᏆ back"
+      }
+    ],
     "configuration": {
       "title": "JumpᏆ",
       "properties": {
@@ -32,7 +32,10 @@
           "description": "Available anchor signs."
         },
         "jumpt.trigger": {
-          "type": ["string", "number"],
+          "type": [
+            "string",
+            "number"
+          ],
           "default": " ",
           "description": "Separator char between a search query and target anchor or static length of the search query followed by target anchor."
         },
@@ -53,23 +56,22 @@
         }
       }
     }
-	},
+  },
   "activationEvents": [
     "onCommand:extension.jumpt"
   ],
   "devDependencies": {
-    "@types/node": "12.7.8",
-    "@types/vscode": "1.38.0",
-    "tslint": "5.20.0",
-    "typescript": "3.6.3"
+    "@types/node": "12.12.14",
+    "@types/vscode": "1.40.0",
+    "tslint": "5.20.1",
+    "typescript": "3.7.2"
   },
   "scripts": {
     "vscode:prepublish": "tsc -p ./",
     "compile": "tsc -p ./",
-		"lint": "tslint -p ./",
+    "lint": "tslint -p ./",
     "watch": "tsc -watch -p ./",
-    "test": "echo \"test\"",
-    "postinstall": "node ./node_modules/vscode/bin/install"
+    "test": "echo \"test\""
   },
   "icon": "assets/icon.png",
   "bugs": {

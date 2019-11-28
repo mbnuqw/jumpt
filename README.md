@@ -18,8 +18,25 @@ Simple vscode extension for fast navigation.
 
 
 ## Commands
-- extension.jumpt - activate jump input
-- extension.jumptback - jump back
+- extension.jumpt - activate jump input  
+  ```json
+  {
+    "key": "...",
+    "command": "extension.jumpt"
+  },
+  {
+    "key": "...",
+    "command": "extension.jumpt",
+    "args": { "select": true }
+  },
+  ```
+- extension.jumptback - jump back  
+  ```json
+  {
+    "key": "...",
+    "command": "extension.jumptback"
+  },
+  ```
 
 
 ## Settings

@@ -14,6 +14,7 @@ interface JumptState {
   decorations: vscode.TextEditorDecorationType[]
   editors: JumptEditorInfo[]
   anchorIndex: number
+  args?: JumptArgs
 }
 
 interface JumptEditorInfo {
@@ -21,6 +22,7 @@ interface JumptEditorInfo {
   isActive: boolean
   text: string
 
+  start: vscode.Position
   startOffset: number
   cursorOffset: number
   endOffset: number
@@ -36,6 +38,10 @@ interface JumptEditorInfo {
 interface JumptTarget {
   viewColumn: number
   position: vscode.Position
+}
+
+interface JumptArgs {
+  select: boolean
 }
 
 const INPUT_PROMPT_TEXT = 'Enter jump query'
@@ -66,7 +72,8 @@ export function deactivate() {}
 /**
  * Handle jumpt command
  */
-async function jumptHandler() {
+async function jumptHandler(args: JumptArgs) {
+  console.log('[DEBUG] so args:', args);
   let editors: JumptEditorInfo[] = []
   for (let editor of vscode.window.visibleTextEditors) {
     if (!editor.viewColumn) continue
@@ -79,6 +86,7 @@ async function jumptHandler() {
       isActive: editor === vscode.window.activeTextEditor,
       text: editor.document.getText(range).toLowerCase(),
 
+      start: selection.active,
       startOffset: editor.document.offsetAt(range.start),
       cursorOffset: editor.document.offsetAt(selection.active),
       endOffset: editor.document.offsetAt(range.end),
@@ -115,6 +123,7 @@ async function jumptHandler() {
     decorations: [],
     anchorIndex: 0,
     editors,
+    args,
   }
 
   let output = await vscode.window.showInputBox(
@@ -175,7 +184,8 @@ function keyHandler(this: JumptState, value: string): undefined {
 
       if (target) {
         saveCurrentPosition()
-        info.editor.selections = [new vscode.Selection(target, target)]
+        let start = this.args?.select ? info.start : target
+        info.editor.selections = [new vscode.Selection(start, target)]
         reset(this)
         if (this.cancellation) this.cancellation.cancel()
         focusColumn(info.editor.viewColumn)
