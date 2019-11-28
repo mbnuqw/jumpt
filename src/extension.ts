@@ -172,7 +172,7 @@ function keyHandler(this: JumptState, value: string): undefined {
   } else {
     let index = value.indexOf(trigger)
     if (index > -1) {
-      targetAnchor = value[index + 1]
+      targetAnchor = value[value.length - 1]
       value = value.slice(0, index)
     }
   }
