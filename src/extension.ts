@@ -14,6 +14,7 @@ interface JumptState {
   decorations: vscode.TextEditorDecorationType[]
   editors: JumptEditorInfo[]
   anchorIndex: number
+  args?: JumptArgs
 }
 
 interface JumptEditorInfo {
@@ -21,6 +22,7 @@ interface JumptEditorInfo {
   isActive: boolean
   text: string
 
+  start: vscode.Position
   startOffset: number
   cursorOffset: number
   endOffset: number
@@ -38,8 +40,12 @@ interface JumptTarget {
   position: vscode.Position
 }
 
+interface JumptArgs {
+  select: boolean
+}
+
 const INPUT_PROMPT_TEXT = 'Enter jump query'
-const INPUT_PLACEHOLDER_TEXT = (settings: JumptSettings) => {
+const INPUT_PLACEHOLDER_TEXT = (settings: JumptSettings): string => {
   let q = 'abc'
   let t = ' '
   if (typeof settings.trigger === 'string') {
@@ -54,19 +60,19 @@ const INPUT_PLACEHOLDER_TEXT = (settings: JumptSettings) => {
 }
 const PREV_POSITIONS: JumptTarget[] = []
 
-export function activate(context: vscode.ExtensionContext) {
+export function activate(context: vscode.ExtensionContext): void {
   context.subscriptions.push(
     vscode.commands.registerCommand('extension.jumpt', jumptHandler),
     vscode.commands.registerCommand('extension.jumptback', jumptBackHandler)
   )
 }
 
-export function deactivate() {}
+export function deactivate(): void {}
 
 /**
  * Handle jumpt command
  */
-async function jumptHandler() {
+async function jumptHandler(args: JumptArgs): Promise<void> {
   let editors: JumptEditorInfo[] = []
   for (let editor of vscode.window.visibleTextEditors) {
     if (!editor.viewColumn) continue
@@ -79,6 +85,7 @@ async function jumptHandler() {
       isActive: editor === vscode.window.activeTextEditor,
       text: editor.document.getText(range).toLowerCase(),
 
+      start: selection.active,
       startOffset: editor.document.offsetAt(range.start),
       cursorOffset: editor.document.offsetAt(selection.active),
       endOffset: editor.document.offsetAt(range.end),
@@ -110,11 +117,12 @@ async function jumptHandler() {
 
   let settings = vscode.workspace.getConfiguration('jumpt')
   let state: JumptState = {
-    settings: (<unknown>settings) as JumptSettings,
+    settings: (settings as unknown) as JumptSettings,
     cancellation: new vscode.CancellationTokenSource(),
     decorations: [],
     anchorIndex: 0,
     editors,
+    args,
   }
 
   let output = await vscode.window.showInputBox(
@@ -134,14 +142,14 @@ async function jumptHandler() {
 /**
  * Just to first target (used with only one target).
  */
-function jumpToFirstTarget(state: JumptState) {
+function jumpToFirstTarget(state: JumptState): void {
   let info = state.editors.find(e => Object.values(e.targets).length)
   if (info) {
     saveCurrentPosition()
     let target = Object.values(info.targets)[0]
     let selection = new vscode.Selection(target, target)
     info.editor.selections = [selection]
-    focusColumn(info.editor.viewColumn)
+    focusColumn(info.editor.viewColumn as number)
     if (state.settings.scroll) scrollToSelectionsCenter()
   }
 }
@@ -163,7 +171,7 @@ function keyHandler(this: JumptState, value: string): undefined {
   } else {
     let index = value.indexOf(trigger)
     if (index > -1) {
-      targetAnchor = value[index + 1]
+      targetAnchor = value[value.length - 1]
       value = value.slice(0, index)
     }
   }
@@ -175,10 +183,11 @@ function keyHandler(this: JumptState, value: string): undefined {
 
       if (target) {
         saveCurrentPosition()
-        info.editor.selections = [new vscode.Selection(target, target)]
+        let start = this.args?.select ? info.start : target
+        info.editor.selections = [new vscode.Selection(start, target)]
         reset(this)
         if (this.cancellation) this.cancellation.cancel()
-        focusColumn(info.editor.viewColumn)
+        focusColumn(info.editor.viewColumn as number)
         if (this.settings.scroll) scrollToSelectionsCenter()
         return
       }
@@ -205,7 +214,7 @@ function keyHandler(this: JumptState, value: string): undefined {
 /**
  * Focus column
  */
-function focusColumn(i: any) {
+function focusColumn(i: number): void {
   let exec = vscode.commands.executeCommand
   if (i === 1) exec('workbench.action.focusFirstEditorGroup')
   if (i === 2) exec('workbench.action.focusSecondEditorGroup')
@@ -246,7 +255,7 @@ function setAnchorBelow(
   state: JumptState,
   info: JumptEditorInfo,
   query: string
-) {
+): void {
   let anchor: string = state.settings.anchors[state.anchorIndex]
   if (!anchor) return
 
@@ -272,7 +281,7 @@ function setAnchorAbove(
   state: JumptState,
   info: JumptEditorInfo,
   query: string
-) {
+): void {
   let anchor: string = state.settings.anchors[state.anchorIndex]
   if (!anchor) return
 
@@ -294,7 +303,7 @@ function setAnchorAbove(
 /**
  * Reset anchors and decorations
  */
-function reset(state: JumptState) {
+function reset(state: JumptState): void {
   state.anchorIndex = 0
   for (let info of state.editors) {
     info.targets = {}
@@ -308,7 +317,7 @@ function reset(state: JumptState) {
 /**
  * Handle jumpt back command
  */
-function jumptBackHandler() {
+function jumptBackHandler(): void {
   if (!PREV_POSITIONS.length) return
 
   let pos = PREV_POSITIONS.pop()
@@ -328,7 +337,7 @@ function jumptBackHandler() {
 /**
  * Save current position
  */
-function saveCurrentPosition() {
+function saveCurrentPosition(): void {
   let editor = vscode.window.activeTextEditor
   if (!editor || !editor.viewColumn) return
   let position = editor.selection.active
@@ -341,7 +350,7 @@ function saveCurrentPosition() {
 /**
  * Scroll to selections center with delay
  */
-function scrollToSelectionsCenter(delay: number = 125) {
+function scrollToSelectionsCenter(delay = 125): void {
   setTimeout(() => {
     let editor = vscode.window.activeTextEditor
     if (!editor) return
