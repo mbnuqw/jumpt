@@ -52,15 +52,30 @@
           "default": false,
           "description": "Auto-scroll to new position."
         },
-        "jumpt.bg": {
+        "jumpt.anchorBg": {
           "type": "string",
           "default": "#0C82F7",
           "description": "Anchor background color."
         },
-        "jumpt.fg": {
+        "jumpt.anchorFg": {
           "type": "string",
           "default": "#ffffff",
           "description": "Anchor foreground color."
+        },
+        "jumpt.queryBg": {
+          "type": "string",
+          "default": "#555555ff",
+          "description": "Query background color."
+        },
+        "jumpt.queryFg": {
+          "type": "string",
+          "default": "",
+          "description": "Query foreground color."
+        },
+        "jumpt.replaceQuery": {
+          "type": "boolean",
+          "default": false,
+          "description": "Replace the entire search query with anchor text."
         }
       }
     }
