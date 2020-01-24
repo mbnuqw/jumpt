@@ -4,8 +4,11 @@ interface JumptSettings {
   anchors: string
   trigger: string | number
   scroll: boolean
-  bg: string
-  fg: string
+  replaceQuery: string
+  anchorBg: string
+  anchorFg: string
+  queryBg: string
+  queryFg: string
 }
 
 interface JumptState {
@@ -225,29 +228,60 @@ function focusColumn(i: number): void {
 /**
  * Create decorator type for the anchor
  */
-function createDecoratorType(
-  state: JumptState,
-  anchor: string,
-  len: number
-): vscode.TextEditorDecorationType {
-  len -= 1
 
+function getQueryUnderscoredText(
+  anchor: string,
+  query: string
+): string{
+  let len = query.length - 1;
   let pre = Math.ceil(len / 2)
   let post = Math.floor(len / 2)
-  let text = '_'.repeat(pre) + anchor + '_'.repeat(post)
+  return '_'.repeat(pre) + anchor + '_'.repeat(post)
+}
 
-  return vscode.window.createTextEditorDecorationType({
+function setStringDecoration(
+  state: JumptState,
+  info: JumptEditorInfo,
+  startOffset: number,
+  targetString: string,
+  bg: string,
+  fg: string
+): void {
+  let start = info.editor.document.positionAt(startOffset)
+  let end = info.editor.document.positionAt(startOffset + targetString.length)
+  let deco = vscode.window.createTextEditorDecorationType({
     letterSpacing: '-16px',
     opacity: '0',
     before: {
-      contentText: text,
-      backgroundColor: state.settings.bg,
-      color: state.settings.fg,
+      contentText: targetString,
+      backgroundColor: bg,
+      color: fg,
       fontWeight: '700',
     },
   })
+  let range = new vscode.Range(start, end)
+  state.decorations.push(deco)
+  info.editor.setDecorations(deco, [range])
 }
 
+function setAnchor(
+  state: JumptState,
+  info: JumptEditorInfo,
+  startOffset: number,
+  anchor: string,
+  query: string
+): void {
+  info.targets[anchor] = info.editor.document.positionAt(startOffset)
+  if(state.settings.replaceQuery){
+    let text = getQueryUnderscoredText(anchor, query);
+    setStringDecoration(state, info, startOffset, text, state.settings.anchorBg, state.settings.anchorFg)
+  }else
+  {
+    setStringDecoration(state, info, startOffset, anchor, state.settings.anchorBg, state.settings.anchorFg)
+    if(anchor.length < query.length)
+      setStringDecoration(state, info, startOffset + anchor.length, query.substr(anchor.length), state.settings.queryBg, state.settings.queryFg)
+  }
+}
 /**
  * Set next anchor
  */
@@ -261,14 +295,7 @@ function setAnchorBelow(
 
   info.postIndex = info.post.indexOf(query, info.postIndex)
   if (info.postIndex !== -1) {
-    let deco = createDecoratorType(state, anchor, query.length)
-    let startOffset = info.cursorOffset + info.postIndex
-    let start = info.editor.document.positionAt(startOffset)
-    let end = info.editor.document.positionAt(startOffset + query.length)
-    let range = new vscode.Range(start, end)
-    state.decorations.push(deco)
-    info.targets[anchor] = range.start
-    info.editor.setDecorations(deco, [range])
+    setAnchor(state, info, info.cursorOffset + info.postIndex, anchor, query)
     info.postIndex++
     state.anchorIndex++
   }
@@ -287,14 +314,7 @@ function setAnchorAbove(
 
   info.preIndex = info.pre.lastIndexOf(query, info.preIndex)
   if (info.preIndex !== -1) {
-    let deco = createDecoratorType(state, anchor, query.length)
-    let startOffset = info.startOffset + info.preIndex
-    let start = info.editor.document.positionAt(startOffset)
-    let end = info.editor.document.positionAt(startOffset + query.length)
-    let range = new vscode.Range(start, end)
-    state.decorations.push(deco)
-    info.targets[anchor] = range.start
-    info.editor.setDecorations(deco, [range])
+    setAnchor(state, info, info.startOffset + info.preIndex, anchor, query)
     info.preIndex--
     state.anchorIndex++
   }
