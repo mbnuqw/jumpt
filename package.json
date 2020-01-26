@@ -85,7 +85,7 @@
         "jumpt.anchorPlaceholderChar": {
           "type": "string",
           "default": "_",
-          "description": "Placeholder char for matched text (for 'fullWidth' anchor mode)"
+          "description": "Placeholder char for 'fullWidth' anchor mode"
         }
       }
     }
