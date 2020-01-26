@@ -55,14 +55,36 @@ Auto-scroll to new position.
 `jumpt.scroll: boolean`  
 `default: false`
 
-__Background color__  
+__Anchor mode__  
+Anchor mode.  
+`jumpt.anchorMode: AnchorMode`  
+`- "default" - Replaces the first char with anchor and highlights matched text`  
+`- "fullWidth" - Replaces the matched text with an anchor surrounded by placeholder chars`  
+`default: "default"`
+
+__Anchor placeholder char__  
+Placeholder char for 'fullWidth' anchor mode.  
+`jumpt.anchorPlaceholderChar: string`  
+`default: "_"`
+
+__Background color of anchor__  
 Anchor background color.  
-`jumpt.bg: string`  
+`jumpt.anchorBg: string`  
 `default: "#0C82F7"`
 
-__Foreground color__  
+__Foreground color of anchor__  
 Anchor foreground color.  
-`jumpt.fg: string`  
+`jumpt.anchorFg: string`  
+`default: "#ffffff"`
+
+__Background color of matched text__  
+Anchor background color.  
+`jumpt.queryBg: string`  
+`default: "#0C82F7"`
+
+__Foreground color of matched text__  
+Anchor foreground color.  
+`jumpt.queryFg: string`  
 `default: "#ffffff"`
 
 
