@@ -102,10 +102,7 @@ async function jumptHandler(args: JumptArgs): Promise<void> {
       targets: {},
     }
 
-    if (
-      info.cursorOffset < info.startOffset ||
-      info.cursorOffset > info.endOffset
-    ) {
+    if (info.cursorOffset < info.startOffset || info.cursorOffset > info.endOffset) {
       info.cursorOffset = info.startOffset
       info.post = info.text
     } else {
@@ -226,19 +223,18 @@ function focusColumn(i: number): void {
 }
 
 /**
- * Create decorator type for the anchor
+ * Generate matched text placeholder
  */
-
-function getQueryUnderscoredText(
-  anchor: string,
-  query: string
-): string{
-  let len = query.length - 1;
+function getQueryPlaceholder(anchor: string, query: string): string {
+  let len = query.length - 1
   let pre = Math.ceil(len / 2)
   let post = Math.floor(len / 2)
   return '_'.repeat(pre) + anchor + '_'.repeat(post)
 }
 
+/**
+ * Set decoration for provided area
+ */
 function setStringDecoration(
   state: JumptState,
   info: JumptEditorInfo,
@@ -264,6 +260,9 @@ function setStringDecoration(
   info.editor.setDecorations(deco, [range])
 }
 
+/**
+ * Set decoration for matched text and anchor
+ */
 function setAnchor(
   state: JumptState,
   info: JumptEditorInfo,
@@ -272,24 +271,29 @@ function setAnchor(
   query: string
 ): void {
   info.targets[anchor] = info.editor.document.positionAt(startOffset)
-  if(state.settings.replaceQuery){
-    let text = getQueryUnderscoredText(anchor, query);
-    setStringDecoration(state, info, startOffset, text, state.settings.anchorBg, state.settings.anchorFg)
-  }else
-  {
-    setStringDecoration(state, info, startOffset, anchor, state.settings.anchorBg, state.settings.anchorFg)
-    if(anchor.length < query.length)
-      setStringDecoration(state, info, startOffset + anchor.length, query.substr(anchor.length), state.settings.queryBg, state.settings.queryFg)
+  let anchorBg = state.settings.anchorBg
+  let anchorFg = state.settings.anchorFg
+
+  if (state.settings.replaceQuery) {
+    let text = getQueryPlaceholder(anchor, query)
+    setStringDecoration(state, info, startOffset, text, anchorBg, anchorFg)
+  } else {
+    setStringDecoration(state, info, startOffset, anchor, anchorBg, anchorFg)
+
+    if (anchor.length < query.length) {
+      let queryBg = state.settings.queryBg
+      let queryFg = state.settings.queryFg
+      let queryText = query.substr(anchor.length)
+
+      setStringDecoration(state, info, startOffset + anchor.length, queryText, queryBg, queryFg)
+    }
   }
 }
+
 /**
  * Set next anchor
  */
-function setAnchorBelow(
-  state: JumptState,
-  info: JumptEditorInfo,
-  query: string
-): void {
+function setAnchorBelow(state: JumptState, info: JumptEditorInfo, query: string): void {
   let anchor: string = state.settings.anchors[state.anchorIndex]
   if (!anchor) return
 
@@ -304,11 +308,7 @@ function setAnchorBelow(
 /**
  * Set prev anchor
  */
-function setAnchorAbove(
-  state: JumptState,
-  info: JumptEditorInfo,
-  query: string
-): void {
+function setAnchorAbove(state: JumptState, info: JumptEditorInfo, query: string): void {
   let anchor: string = state.settings.anchors[state.anchorIndex]
   if (!anchor) return
 

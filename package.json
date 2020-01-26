@@ -89,7 +89,11 @@
     "@typescript-eslint/eslint-plugin": "2.9.0",
     "@typescript-eslint/parser": "2.9.0",
     "eslint": "6.7.1",
-    "typescript": "3.7.2"
+    "eslint-config-prettier": "6.9.0",
+    "eslint-plugin-prettier": "3.1.2",
+    "prettier": "1.19.1",
+    "typescript": "3.7.2",
+    "vscode": "1.1.36"
   },
   "scripts": {
     "vscode:prepublish": "tsc -p ./",
@@ -101,6 +105,14 @@
   "icon": "assets/icon.png",
   "bugs": {
     "url": "https://github.com/mbnuqw/jumpt/issues"
+  },
+  "prettier": {
+    "semi": false,
+    "singleQuote": true,
+    "trailingComma": "es5",
+    "tabWidth": 2,
+    "printWidth": 100,
+    "useTabs": false
   },
   "repository": {
     "type": "git",
