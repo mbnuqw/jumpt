@@ -281,7 +281,7 @@ function setAnchor(
   let anchorFg = state.settings.anchorFg
 
   if (query.length === anchor.length) {
-    return setStringDecoration(state, info, startOffset, query, anchorBg, anchorFg)
+    return setStringDecoration(state, info, startOffset, anchor, anchorBg, anchorFg)
   }
 
   if (state.settings.anchorMode === AnchorMode.FullWidth) {
