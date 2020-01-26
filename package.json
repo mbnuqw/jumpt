@@ -72,10 +72,20 @@
           "default": "",
           "description": "Query foreground color."
         },
-        "jumpt.replaceQuery": {
-          "type": "boolean",
-          "default": false,
-          "description": "Replace the entire search query with anchor text."
+        "jumpt.anchorMode": {
+          "type": "string",
+          "default": "default",
+          "description": "Anchors mode",
+          "enum": ["default", "fullWidth"],
+          "enumDescriptions": [
+            "Replaces the first char with anchor and highlights matched text",
+            "Replaces the matched text with an anchor surrounded by placeholder chars"
+          ]
+        },
+        "jumpt.anchorPlaceholderChar": {
+          "type": "string",
+          "default": "_",
+          "description": "Placeholder char for matched text (for 'fullWidth' anchor mode)"
         }
       }
     }

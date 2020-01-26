@@ -1,10 +1,16 @@
 import * as vscode from 'vscode'
 
+enum AnchorMode {
+  Default = 'default',
+  FullWidth = 'fullWidth',
+}
+
 interface JumptSettings {
   anchors: string
   trigger: string | number
   scroll: boolean
-  replaceQuery: string
+  anchorMode: AnchorMode
+  anchorPlaceholderChar: string
   anchorBg: string
   anchorFg: string
   queryBg: string
@@ -225,11 +231,11 @@ function focusColumn(i: number): void {
 /**
  * Generate matched text placeholder
  */
-function getQueryPlaceholder(anchor: string, query: string): string {
+function getQueryPlaceholder(anchor: string, query: string, char: string): string {
   let len = query.length - 1
   let pre = Math.ceil(len / 2)
   let post = Math.floor(len / 2)
-  return '_'.repeat(pre) + anchor + '_'.repeat(post)
+  return char.repeat(pre) + anchor + char.repeat(post)
 }
 
 /**
@@ -274,19 +280,21 @@ function setAnchor(
   let anchorBg = state.settings.anchorBg
   let anchorFg = state.settings.anchorFg
 
-  if (state.settings.replaceQuery) {
-    let text = getQueryPlaceholder(anchor, query)
+  if (query.length === anchor.length) {
+    return setStringDecoration(state, info, startOffset, query, anchorBg, anchorFg)
+  }
+
+  if (state.settings.anchorMode === AnchorMode.FullWidth) {
+    let text = getQueryPlaceholder(anchor, query, state.settings.anchorPlaceholderChar)
+
     setStringDecoration(state, info, startOffset, text, anchorBg, anchorFg)
   } else {
+    let queryBg = state.settings.queryBg
+    let queryFg = state.settings.queryFg
+    let queryText = query.substr(anchor.length)
+
     setStringDecoration(state, info, startOffset, anchor, anchorBg, anchorFg)
-
-    if (anchor.length < query.length) {
-      let queryBg = state.settings.queryBg
-      let queryFg = state.settings.queryFg
-      let queryText = query.substr(anchor.length)
-
-      setStringDecoration(state, info, startOffset + anchor.length, queryText, queryBg, queryFg)
-    }
+    setStringDecoration(state, info, startOffset + anchor.length, queryText, queryBg, queryFg)
   }
 }
 
