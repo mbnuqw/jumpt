@@ -29,6 +29,11 @@ Simple vscode extension for fast navigation.
     "command": "extension.jumpt",
     "args": { "select": true }
   },
+  {
+    "key": "...",
+    "command": "extension.jumpt",
+    "args": { "caseSensitive": true }
+  },
   ```
 - extension.jumptback - jump back  
   ```json

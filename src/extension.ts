@@ -51,6 +51,7 @@ interface JumptTarget {
 
 interface JumptArgs {
   select: boolean
+  caseSensitive: boolean
 }
 
 const INPUT_PROMPT_TEXT = 'Enter jump query'
@@ -89,10 +90,14 @@ async function jumptHandler(args: JumptArgs): Promise<void> {
     let range = editor.visibleRanges[0]
     let selection = editor.selection
 
+    let text: string
+    if (args && args.caseSensitive) text = editor.document.getText(range)
+    else text = editor.document.getText(range).toLowerCase()
+
     let info = {
       editor,
       isActive: editor === vscode.window.activeTextEditor,
-      text: editor.document.getText(range).toLowerCase(),
+      text,
 
       start: selection.active,
       startOffset: editor.document.offsetAt(range.start),
